@@ -1,6 +1,7 @@
 let React = require('react');
 let Clock = require('Clock');
 let CountdownForm = require('CountdownForm');
+let Controls = require('Controls');
 
 let Countdown = React.createClass({
     getInitialState: function() {
@@ -15,6 +16,12 @@ let Countdown = React.createClass({
                 case 'started':
                     this.startTimer();
                     break;
+                case 'stopped':
+                    this.setState({count: 0});
+                case 'paused':
+                    clearInterval(this.timer);
+                    this.timer = undefined;
+                    break;
             }
         }
     },
@@ -24,11 +31,8 @@ let Countdown = React.createClass({
             this.setState({
                 count: newCount >= 0 ? newCount : 0
             });
-            if (!newCount) {
-                clearInterval(this.timer);
-                this.setState({
-                    countdownStatus: 'stopped'
-                });
+            if (newCount === 0) {
+                this.setState({countdownStatus: 'stopped'});
             }
         }, 1000);
     },
@@ -38,13 +42,24 @@ let Countdown = React.createClass({
             countdownStatus: 'started'
         });
     },
+    handleStatusChange: function(newStatus) {
+        this.setState({countdownStatus: newStatus});
+    },
     render: function() {
-        let {count} = this.state;
+        let {count, countdownStatus} = this.state;
+        let renderControlArea = () => {
+            if (countdownStatus !== 'stopped') {
+                return <Controls countdownStatus={countdownStatus}
+                                 onStatusChange={this.handleStatusChange}/>;
+            } else {
+                return <CountdownForm onSetCountdown={this.handleSetCountdown}/>;
+            }
+        };
 
         return (
             <div>
                 <Clock totalSeconds={count}/>
-                <CountdownForm onSetCountdown={this.handleSetCountdown}/>
+                {renderControlArea()}
             </div>
         );
     }
