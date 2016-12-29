@@ -3,7 +3,9 @@ let webpackConfig = require('./webpack.config');
 module.exports = function(config) {
     config.set({
         browsers: ['Chrome'],
-        singleRun: true,
+        singleRun: false,
+        autoWatch: true,
+        port: 9000,
         frameworks: ['mocha'],
         files: ['app/tests/**/*.test.jsx'],
         preprocessors: {
